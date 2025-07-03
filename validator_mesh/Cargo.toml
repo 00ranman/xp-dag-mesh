@@ -1,0 +1,17 @@
+[package]
+name = "validator_mesh"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+common = { path = "../common" }
+dag_core = { path = "../dag_core" }
+tokio.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+dashmap.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+futures.workspace = true
+crossbeam.workspace = true
