@@ -1,5 +1,7 @@
 # XP DAG Mesh
 
+> **Ecosystem Note:** This is the standalone Rust implementation of the DAG Layer 1 protocol. It provides the consensus and transaction layer for the [extropy-engine](https://github.com/00ranman/extropy-engine) monorepo ecosystem. XP minting uses the same `XP = R × F × ΔS × (w · E) × log(1/Tₛ)` formula as `packages/xp-mint`. Validator mesh coordinates with [SignalFlow](https://github.com/00ranman/signalflow) for real-time orchestration. See [ECOSYSTEM_MAP.md](https://github.com/00ranman/extropy-engine/blob/main/ECOSYSTEM_MAP.md) for the full repository mapping.
+
 Physics-anchored DAG Layer 1 protocol with entropy-weighted consensus for the Extropy Engine ecosystem.
 
 ## Overview
