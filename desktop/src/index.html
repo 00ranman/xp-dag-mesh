@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XP DAG Mesh</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --text: #e0e0e0;
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.3);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    #app {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      grid-template-rows: 56px 1fr;
+      min-height: 100vh;
+    }
+    .topbar {
+      grid-column: 1 / -1;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+    }
+    .topbar h1 { font-size: 16px; font-weight: 600; }
+    .topbar .status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--warning);
+    }
+    .status-dot.connected { background: var(--success); }
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .sidebar nav a {
+      display: block;
+      padding: 10px 20px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      opacity: 0.7;
+      transition: all 0.15s;
+    }
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      opacity: 1;
+      background: rgba(124, 58, 237, 0.1);
+      border-right: 2px solid var(--accent);
+    }
+    .main {
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .card h2 { font-size: 14px; margin-bottom: 12px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric { font-size: 32px; font-weight: 700; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .tier-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .tier-observer { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+    .tier-contributor { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .tier-validator { background: rgba(124, 58, 237, 0.2); color: #a78bfa; }
+    .tier-coordinator { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="topbar">
+      <h1>XP DAG Mesh</h1>
+      <div class="status">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Disconnected</span>
+      </div>
+    </div>
+    <div class="sidebar">
+      <nav>
+        <a href="#" class="active" data-view="dashboard">Dashboard</a>
+        <a href="#" data-view="node">Node</a>
+        <a href="#" data-view="wallet">Wallet</a>
+        <a href="#" data-view="peers">Peers</a>
+        <a href="#" data-view="dag">DAG Explorer</a>
+        <a href="#" data-view="settings">Settings</a>
+      </nav>
+    </div>
+    <div class="main" id="main-content">
+      <div class="grid-3">
+        <div class="card">
+          <h2>Access Tier</h2>
+          <span class="tier-badge tier-observer" id="tier-badge">Observer</span>
+        </div>
+        <div class="card">
+          <h2>Connected Peers</h2>
+          <div class="metric" id="peer-count">0</div>
+        </div>
+        <div class="card">
+          <h2>DAG Vertices</h2>
+          <div class="metric" id="vertex-count">0</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h2>Node Controls</h2>
+          <p style="margin-bottom: 12px; opacity: 0.7; font-size: 14px;">Start your mesh node to join the network.</p>
+          <button class="btn btn-primary" id="btn-start">Start Node</button>
+        </div>
+        <div class="card">
+          <h2>Performance</h2>
+          <p style="font-size: 14px; opacity: 0.7;">Kelly Fraction: <strong id="kelly">--</strong></p>
+          <p style="font-size: 14px; opacity: 0.7;">Sharpe Ratio: <strong id="sharpe">--</strong></p>
+          <p style="font-size: 14px; opacity: 0.7;">Uptime: <strong id="uptime">--</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
